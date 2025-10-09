@@ -9,6 +9,8 @@ namespace Stock.Context
         public DbSet<Location> Locations { get; set; } = null!;
         public DbSet<Receive> Receives { get; set; } = null!;
         public DbSet<Issue> Issues { get; set; } = null !;
+        public DbSet<StockWH> Stocks { get; set; } = null!;
+        public DbSet<ProductControll> ProductControls { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
