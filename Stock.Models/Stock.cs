@@ -1,0 +1,21 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
+namespace Stock.Models
+{
+    public class Stock
+    {
+        public int Id { get; set; }
+        public int Year { get; set; }
+        public int Month { get; set; }
+        public virtual Location Location { get; set; } = null!;
+        public string Product { get; set; }
+        public decimal BfQty { get; set; }
+        public decimal InQty { get; set; }
+        public decimal OutQty { get; set; }
+    }
+}
