@@ -8,6 +8,9 @@ namespace Stock.Models.ViewModels
 {
     public class ReceiveResponse
     {
-      
+        public string Product { get; set; }
+        public int LocationId { get; set; }
+        public string StatusName { get; set; } = string.Empty;       
+       
     }
 }

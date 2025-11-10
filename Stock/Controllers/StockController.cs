@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Stock.Context;
 using Stock.Models;
 using System.Text.RegularExpressions;
@@ -12,7 +13,26 @@ namespace Stock.Controllers
     {
         private readonly DataContext db;
         public StockController(DataContext db) => this.db = db;
-       
+
+        [HttpGet("GetOnHand/{item}/{location}")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<List<Receive>>> GetDataById(string item, int location)
+        {
+            try
+            {
+                var stock = await db.Stocks.Where(w => w.Year == DateTime.Now.Year && w.Month == DateTime.Now.Month && w.Product == item && w.Location.Id == location).SumAsync(s => s.BfQty + s.InQty - s.OutQty);
+
+
+                return Ok(stock);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+
 
         //อันที่เคยใช้ ที่ทำให้ช้ามากกกกกกกกกกกก
         [HttpPost("UpdateStockIn")]
@@ -48,18 +68,18 @@ namespace Stock.Controllers
 
                         var location = locationList.Where(x => x.Id == item.Location.Id).SingleOrDefault();
                         //var unit = unitList.Where(x => x.Id == item.Unit.Id).SingleOrDefault();
-                        var group = groupList.Where(x => x.Id == item.Group.Id).SingleOrDefault();
+                        //var group = groupList.Where(x => x.Id == item.Group.Id).SingleOrDefault();
                         if (location != null)
                         //if (location != null && unit != null)
                         {
-                            stock = new Models.Stock
+                            stock = new Models.StockWH
                             {
                                 Year = item.Year,
                                 Month = item.Month,
                                 Location = location,
                                 //Unit = unit,
-                                Group = group,
-                                WorkOrder = item.WorkOrder,
+                                //Group = group,
+                                Product = item.Product,
                                 BfQty = 0,
                                 InQty = item.InQty,
                                 OutQty = 0,
@@ -86,13 +106,13 @@ namespace Stock.Controllers
         [HttpPost("UpdateStockOut")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<bool> StockOut(List<Models.Stock> stockList)
+        public async Task<bool> StockOut(List<Models.StockWH> stockList)
         {
             try
             {
                 var locationList = db.Locations.Where(x => x.IsActive).ToList();
-                var unitList = db.Units.Where(x => x.IsActive).ToList();
-                var groupList = db.Groups.Where(x => x.IsActive).ToList();
+                //var unitList = db.Units.Where(x => x.IsActive).ToList();
+                //var groupList = db.Groups.Where(x => x.IsActive).ToList();
 
                 foreach (var item in stockList)
                 {
@@ -100,8 +120,8 @@ namespace Stock.Controllers
                                                     x.Month == item.Month &&
                                                     x.Location.Id == item.Location.Id &&
                                                     //x.Unit.Id == item.Unit.Id &&
-                                                    x.Group.Id == item.Group.Id &&
-                                                    x.WorkOrder == item.WorkOrder
+                                                    //x.Group.Id == item.Group.Id &&
+                                                    x.Product == item.Product
                                                     ).SingleOrDefault();
 
                     if (stock != null)
@@ -112,19 +132,19 @@ namespace Stock.Controllers
                     {
                         var location = locationList.Where(x => x.Id == item.Location.Id).SingleOrDefault();
                         //var unit = unitList.Where(x => x.Id == item.Unit.Id).SingleOrDefault();
-                        var group = groupList.Where(x => x.Id == item.Group.Id).SingleOrDefault();
+                        //var group = groupList.Where(x => x.Id == item.Group.Id).SingleOrDefault();
 
                         if (location != null)
                         //if (location != null && unit != null)
                         {
-                            stock = new Models.Stock
+                            stock = new Models.StockWH
                             {
                                 Year = item.Year,
                                 Month = item.Month,
                                 Location = location,
                                 //Unit = unit,
-                                Group = group,
-                                WorkOrder = item.WorkOrder,
+                                // Group = group,
+                                Product = item.Product,
                                 BfQty = 0,
                                 InQty = 0,
                                 OutQty = item.OutQty,
@@ -150,7 +170,7 @@ namespace Stock.Controllers
         [HttpPost("UpdateStockMove")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<bool> StockMove(List<Models.Stock> stockList)
+        public async Task<bool> StockMove(List<Models.StockWH> stockList)
         {
             try
             {
@@ -169,7 +189,7 @@ namespace Stock.Controllers
             }
         }
 
-        private async void StockBF(List<Models.Stock> stockList)
+        private async void StockBF(List<Models.StockWH> stockList)
         {
             try
             {
@@ -186,9 +206,9 @@ namespace Stock.Controllers
                     var dataList = db.Stocks.Where(x => x.Year == p.Key.Year
                                                          && x.Month == p.Key.Month
                                                          )
-                                    .Include(x => x.Location)
+                                    // .Include(x => x.Location)
                                     //.Include(x => x.Unit)
-                                    .Include(x => x.Group)
+                                    //.Include(x => x.Group)
                                     .ToList();
 
                     if (dataList?.Count() == 0)
@@ -197,8 +217,8 @@ namespace Stock.Controllers
                     }
 
                     var locationList = db.Locations.Where(x => x.IsActive).ToList();
-                    var unitList = db.Units.Where(x => x.IsActive).ToList();
-                    var groupList = db.Groups.Where(x => x.IsActive).ToList();
+                    //var unitList = db.Units.Where(x => x.IsActive).ToList();
+                    //var groupList = db.Groups.Where(x => x.IsActive).ToList();
 
 
                     foreach (var item in dataList)
@@ -208,8 +228,8 @@ namespace Stock.Controllers
                                                     x.Month == item.Month &&
                                                     x.Location.Id == item.Location.Id &&
                                                     //x.Unit.Id == item.Unit.Id &&
-                                                    x.Group.Id == item.Group.Id &&
-                                                    x.WorkOrder == item.WorkOrder
+                                                    //x.Group.Id == item.Group.Id &&
+                                                    x.Product == item.Product
                                                     ).SingleOrDefault();
 
                         if (stock != null)
@@ -220,19 +240,19 @@ namespace Stock.Controllers
                         {
                             var location = locationList.Where(x => x.Id == item.Location.Id).SingleOrDefault();
                             //var unit = unitList.Where(x => x.Id == item.Unit.Id).SingleOrDefault();
-                            var group = groupList.Where(x => x.Id == item.Group.Id).SingleOrDefault();
+                            //var group = groupList.Where(x => x.Id == item.Group.Id).SingleOrDefault();
 
                             if (location != null)
                             //if (location != null && unit != null)
                             {
-                                stock = new Models.Stock
+                                stock = new Models.StockWH
                                 {
                                     Year = nyear,
                                     Month = nmonth,
                                     Location = location,
                                     //Unit = unit,
-                                    Group = group,
-                                    WorkOrder = item.WorkOrder,
+                                    //Group = group,
+                                    Product = item.Product,
                                     BfQty = item.BfQty + item.InQty - item.OutQty,
                                     InQty = 0,
                                     OutQty = 0,
@@ -251,7 +271,7 @@ namespace Stock.Controllers
             }
         }
 
-        private async void UpdateStock(int year, int month, int nyear, int nmonth, Location location, Group group, int WorkOrder, List<Stock> stockList, decimal bfqty, decimal inqty, decimal outqty)
+        private async void UpdateStock(int year, int month, int nyear, int nmonth, Location location, string Product, List<StockWH> stockList, decimal bfqty, decimal inqty, decimal outqty)
         {
             try
             {
@@ -261,8 +281,8 @@ namespace Stock.Controllers
                                             && x.Month == month
                                             && x.Location.Id == location.Id
                                             //&& x.Unit.Id == unit.Id
-                                            && x.Group.Id == group.Id
-                                            && x.WorkOrder == WorkOrder)
+                                            //&& x.Group.Id == group.Id
+                                            && x.Product == Product)
                     .FirstOrDefault();
                 if (stock != null)
                 {
@@ -274,14 +294,14 @@ namespace Stock.Controllers
                 else
                 {
                     //add new stock
-                    stock = new Models.Stock
+                    stock = new Models.StockWH
                     {
                         Year = year,
                         Month = month,
                         Location = location,
                         //Unit = unit,
-                        Group = group,
-                        WorkOrder = WorkOrder,
+                        //Group = group,
+                        Product = Product,
                         BfQty = bfqty,
                         InQty = inqty,
                         OutQty = outqty,
@@ -298,8 +318,8 @@ namespace Stock.Controllers
                                             && x.Month == nmonth
                                             && x.Location.Id == location.Id
                                             //&& x.Unit.Id == unit.Id
-                                            && x.Group.Id == group.Id
-                                            && x.WorkOrder == WorkOrder).FirstOrDefault();
+                                            //&& x.Group.Id == group.Id
+                                            && x.Product == Product).FirstOrDefault();
                 if (nstock != null)
                 {
                     //update next stock
@@ -310,14 +330,14 @@ namespace Stock.Controllers
                 else
                 {
                     //add new next stock  
-                    nstock = new Models.Stock
+                    nstock = new Models.StockWH
                     {
                         Year = nyear,
                         Month = nmonth,
                         Location = location,
                         ///Unit = unit,
-                        Group = group,
-                        WorkOrder = WorkOrder,
+                        //Group = group,
+                        Product = Product,
                         BfQty = nQty,
                         InQty = 0,
                         OutQty = 0,
@@ -332,6 +352,6 @@ namespace Stock.Controllers
             }
         }
 
-      
+
     }
 }

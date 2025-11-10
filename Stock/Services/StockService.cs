@@ -5,7 +5,7 @@ namespace Stock.Services
 {
     public class StockService
     {
-        public bool addStockIn(int year, int month, Location location, Group group, int workorder, string product, decimal qty, List<Models.Stock> stockList = null!)
+        public bool addStockIn(int year, int month, Location location, string product, decimal qty, List<Models.StockWH> stockList = null!)
         {
             try
             {
@@ -26,7 +26,7 @@ namespace Stock.Services
                 }
                 else
                 {
-                    var stock = new Models.Stock();
+                    var stock = new Models.StockWH();
                     stock.Year = year;
                     stock.Month = month;
                     stock.Location = location;
@@ -48,7 +48,7 @@ namespace Stock.Services
             }
         }
 
-        public bool addStockOut(int year, int month, Location location, Group group, int workorder, string product, decimal qty, List<Models.Stock> stockList = null!)
+        public bool addStockOut(int year, int month, Location location, string product, decimal qty, List<Models.StockWH> stockList = null!)
         {
             {
                 try
@@ -70,7 +70,7 @@ namespace Stock.Services
                     }
                     else
                     {
-                        var stock = new Models.Stock();
+                        var stock = new Models.StockWH();
                         stock.Year = year;
                         stock.Month = month;
                         stock.Location = location;
@@ -94,7 +94,7 @@ namespace Stock.Services
         }
 
 
-        public bool removeStockIn(int year, int month, Location location, Group group, int workorder, string product, decimal qty, List<Models.Stock> stockList = null!)
+        public bool removeStockIn(int year, int month, Location location,  string product, decimal qty, List<Models.StockWH> stockList = null!)
         {
             try
             {
@@ -115,7 +115,7 @@ namespace Stock.Services
                 }
                 else
                 {
-                    var stock = new Models.Stock();
+                    var stock = new Models.StockWH();
                     stock.Year = year;
                     stock.Month = month;
                     stock.Location = location;
@@ -137,7 +137,7 @@ namespace Stock.Services
             }
         }
 
-        public bool removeStockOut(int year, int month, Location location, Group group, int workorder, string product, decimal qty, List<Models.Stock> stockList = null!)
+        public bool removeStockOut(int year, int month, Location location,  string product, decimal qty, List<Models.StockWH> stockList = null!)
         {
             try
             {
@@ -158,7 +158,7 @@ namespace Stock.Services
                 }
                 else
                 {
-                    var stock = new Models.Stock();
+                    var stock = new Models.StockWH();
                     stock.Year = year;
                     stock.Month = month;
                     stock.Location = location;
@@ -166,7 +166,7 @@ namespace Stock.Services
                     //stock.Unit = unit;
                     //stock.Group = group;
                     //stock.WorkOrder = workorder;
-                    stock.Product= product;
+                    stock.Product = product;
                     stock.InQty = 0;
                     stock.OutQty -= qty;
                     stockList.Add(stock);

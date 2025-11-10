@@ -11,7 +11,7 @@ namespace Stock.Models
     {
         public int Id { get; set; }
         public int EmployeeCode { get; set; }
-        public string Product { get; set; }
+        public string Product { get; set; } = string.Empty;
         public virtual Location Location { get; set; } = null!;          
         public decimal Qty { get; set; } = 0;
         public bool IsActive { get; set; } = true;
