@@ -191,6 +191,7 @@ namespace Stock.Controllers
 
         private async void StockBF(List<Models.StockWH> stockList)
         {
+            var error = new Models.StockWH();
             try
             {
                 var periodList = stockList.GroupBy(x => new { Year = x.Year, Month = x.Month }).ToList();
@@ -223,6 +224,7 @@ namespace Stock.Controllers
 
                     foreach (var item in dataList)
                     {
+                        error = item;
                         var stock = stockNextList.Where(x =>
                                                    x.Year == item.Year &&
                                                     x.Month == item.Month &&
@@ -267,6 +269,7 @@ namespace Stock.Controllers
             }
             catch (Exception ex)
             {
+                var rr = error;
                 throw new Exception(ex.ToString());
             }
         }
