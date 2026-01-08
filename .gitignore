@@ -1,0 +1,35 @@
+# Ignore bin and obj folders
+bin/
+obj/
+
+
+# Ignore user-specific files
+*.user
+*.suo
+
+# Ignore Visual Studio folders
+.vs/
+
+# Ignore other specific file types
+*.sou
+
+# Other common C# and Visual Studio ignores
+*.sln.docstates
+_ReSharper*/
+*.resharper
+*.sln.ide
+*.DotSettings
+.vscode/
+
+# Ignore coverage tool folders
+coverage/
+
+# Ignore build output folders
+**/build/
+**/bld/
+
+# Ignore packages folder
+packages/
+
+# Ignore publish output
+.publish/
