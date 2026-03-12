@@ -33,7 +33,6 @@ namespace Stock.Controllers
             }
         }
 
-
         //ทดสอบ
         [HttpGet("GetOnHandByProduct/{product}")]
         public async Task<ActionResult<List<StockOnHandDto>>> GetOnHandByProduct(string product)
@@ -72,9 +71,6 @@ namespace Stock.Controllers
             return Ok(stocks);
         }
 
-
-
-
         //ใช้งานได้จริง
         [HttpGet("GetOnHand")]
         public async Task<ActionResult<List<StockOnHandDto>>> GetAllOnHand()
@@ -100,7 +96,8 @@ namespace Stock.Controllers
                         IssueQty = g.Sum(x => x.OutQty),
                         OnHand = g.Sum(x => x.BfQty + x.InQty - x.OutQty)
                     })
-                    .Where(x => x.OnHand != 0m)
+                    //.Where(x => x.OnHand != 0m)
+                    .Where(x => x.OnHand > 0m)
                     .Select(x => new StockOnHandDto
                     {
                         Product = x.Product,
@@ -120,6 +117,54 @@ namespace Stock.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
+
+        ////ทดสอบ  ไม่มี now ยังยกยอดไม่นิ่ง
+        //[HttpGet("GetOnHand")]
+        //public async Task<ActionResult<List<StockOnHandDto>>> GetAllOnHand()
+        //{
+        //    try
+        //    {
+        //        //var now = DateTime.Now;
+        //        var y = DateTime.Now.Year;
+        //        var stocks = await db.Stocks
+        //             .Where(w => w.Year == y)
+        //            .GroupBy(w => new
+        //            {
+        //                w.Product,
+        //                LocationId = w.Location.Id,
+        //                LocationName = w.Location.Name
+        //            })
+        //            .Select(g => new
+        //            {
+        //                g.Key.Product,
+        //                g.Key.LocationId,
+        //                g.Key.LocationName,
+        //                BfQty = g.Sum(x => x.BfQty),
+        //                ReceiveQty = g.Sum(x => x.InQty),
+        //                IssueQty = g.Sum(x => x.OutQty),
+        //                OnHand = g.Sum(x => x.BfQty + x.InQty - x.OutQty)
+        //            })
+        //            .Where(x => x.OnHand > 0m)
+        //            .Select(x => new StockOnHandDto
+        //            {
+        //                Product = x.Product,
+        //                LocationId = x.LocationId,
+        //                LocationName = x.LocationName,
+        //                BfQty = x.BfQty,
+        //                ReceiveQty = x.ReceiveQty,
+        //                IssueQty = x.IssueQty,
+        //                OnHand = x.OnHand
+        //            })
+        //            .ToListAsync();
+
+        //        return Ok(stocks);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        //    }
+        //}
 
 
 
@@ -368,7 +413,7 @@ namespace Stock.Controllers
                     foreach (var c in carries)
                     {
                         var key = Key(c.LocId, c.Product);
-                        if (mapNext.TryGetValue(key, out var next))
+                       if (mapNext.TryGetValue(key, out StockWH? next) && next is not null)
                         {
                             next.BfQty += c.Carry; // update ยอด BF กลางเดือนถัดไป
                         }

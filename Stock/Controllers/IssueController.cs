@@ -89,7 +89,7 @@ namespace Stock.Controllers
         //อันที่ใช้ได้ปกติ
         [HttpGet("GetLocationByProduct/{product}")]
         public async Task<ActionResult> GetLocationsByProduct(
-    string product, int? year = null, int? month = null)
+            string product, int? year = null, int? month = null)
         {
             // base query เฉพาะ product นี้
             var q = db.Stocks.Where(s => s.Product == product);
